@@ -226,6 +226,7 @@
             btnLoad.TabIndex = 2;
             btnLoad.Text = "讀取";
             btnLoad.UseVisualStyleBackColor = false;
+            btnLoad.Click += btnLoad_Click;
             // 
             // btnAdd
             // 
