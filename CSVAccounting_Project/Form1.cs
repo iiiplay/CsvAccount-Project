@@ -116,7 +116,7 @@ namespace CSVAccounting_Project
             {
                 items.Clear();
 
-
+                this.Text = "CSV 記帳APP - " + Path.GetFileName(ofd.FileName);
                 try
                 {
                     string[] lines = File.ReadAllLines(
@@ -128,17 +128,18 @@ namespace CSVAccounting_Project
                         string[] cols = lines[i].Split(',');
                         if (cols.Length < 5) continue;
 
-                        Item item = new Item
-                        {
-                            Date = DateTime.Parse(cols[0]),
-                            Note = cols[1],
-                            Amount = decimal.Parse(cols[2]),
-                            IsIncome = cols[3] == "是" ? true : false,
-                            CategoryType = (Category)
-                                Enum.Parse(typeof(Category), cols[4])
-                        };
+                        Item item = new Item();
+
+                        item.Date = DateTime.Parse(cols[0]);
+                        item.Note = cols[1];
+                        item.Amount = decimal.Parse(cols[2]);
+                        item.IsIncome = cols[3] == "是" ? true : false;
+                        item.CategoryType = (Category)Enum.Parse(typeof(Category), cols[4]);
+
                         items.Add(item);
                     }
+
+                    Calculate();
                 }
                 catch (Exception)
                 {
@@ -180,6 +181,37 @@ namespace CSVAccounting_Project
                     sw.WriteLine(line);
                 }
             }
+        }
+
+        private void btnClean_Click(object sender, EventArgs e)
+        {
+            if (items.Count == 0 || MessageBox.Show("確定全部清除嗎?", "警告",
+             MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            items.Clear();
+        }
+
+
+        private void Calculate()
+        {
+            double incoming = 0, outgoing = 0;
+            foreach (Item item in items)
+            {
+                if (item.IsIncome)
+                {
+                    incoming += (double)item.Amount;
+                }
+                else
+                {
+                    outgoing += (double)item.Amount;
+                }
+            }
+
+            lblIncoming.Text = $"| 收入:{incoming}";
+            lbloutgoing.Text = $"| 支出:{outgoing}";
+
+            lblTotal.Text = $"{incoming - outgoing}";
         }
     }
 }
