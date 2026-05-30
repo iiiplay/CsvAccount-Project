@@ -39,6 +39,9 @@
             label1 = new Label();
             dtpDate = new DateTimePicker();
             panel2 = new Panel();
+            lblTotal = new Label();
+            lblOutgoing = new Label();
+            lblIncoming = new Label();
             btnDelete = new Button();
             btnUpdate = new Button();
             btnClean = new Button();
@@ -157,6 +160,9 @@
             // panel2
             // 
             panel2.BorderStyle = BorderStyle.Fixed3D;
+            panel2.Controls.Add(lblTotal);
+            panel2.Controls.Add(lblOutgoing);
+            panel2.Controls.Add(lblIncoming);
             panel2.Controls.Add(btnDelete);
             panel2.Controls.Add(btnUpdate);
             panel2.Controls.Add(btnClean);
@@ -168,6 +174,36 @@
             panel2.Name = "panel2";
             panel2.Size = new Size(982, 61);
             panel2.TabIndex = 2;
+            // 
+            // lblTotal
+            // 
+            lblTotal.AutoSize = true;
+            lblTotal.ForeColor = Color.Green;
+            lblTotal.Location = new Point(511, 23);
+            lblTotal.Name = "lblTotal";
+            lblTotal.Size = new Size(41, 15);
+            lblTotal.TabIndex = 9;
+            lblTotal.Text = "結餘:0";
+            // 
+            // lblOutgoing
+            // 
+            lblOutgoing.AutoSize = true;
+            lblOutgoing.ForeColor = Color.Red;
+            lblOutgoing.Location = new Point(429, 23);
+            lblOutgoing.Name = "lblOutgoing";
+            lblOutgoing.Size = new Size(41, 15);
+            lblOutgoing.TabIndex = 8;
+            lblOutgoing.Text = "支出:0";
+            // 
+            // lblIncoming
+            // 
+            lblIncoming.AutoSize = true;
+            lblIncoming.ForeColor = Color.Blue;
+            lblIncoming.Location = new Point(347, 23);
+            lblIncoming.Name = "lblIncoming";
+            lblIncoming.Size = new Size(41, 15);
+            lblIncoming.TabIndex = 7;
+            lblIncoming.Text = "收入:0";
             // 
             // btnDelete
             // 
@@ -203,6 +239,7 @@
             btnClean.TabIndex = 4;
             btnClean.Text = "清除";
             btnClean.UseVisualStyleBackColor = false;
+            btnClean.Click += btnClean_Click;
             // 
             // btnSave
             // 
@@ -312,6 +349,7 @@
             panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)nudAmount).EndInit();
             panel2.ResumeLayout(false);
+            panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvItems).EndInit();
             ((System.ComponentModel.ISupportInitialize)itemBindingSource).EndInit();
             ResumeLayout(false);
@@ -342,5 +380,8 @@
         private DataGridViewTextBoxColumn amountDataGridViewTextBoxColumn;
         private DataGridViewTextBoxColumn categoryTypeDataGridViewTextBoxColumn;
         private DataGridViewCheckBoxColumn isIncomeDataGridViewCheckBoxColumn;
+        private Label lblIncoming;
+        private Label lblOutgoing;
+        private Label lblTotal;
     }
 }

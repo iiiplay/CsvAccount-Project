@@ -43,6 +43,7 @@ namespace CSVAccounting_Project
             item.CategoryType = (Category)cmbCategory.SelectedItem!;
 
             itemList.Add(item);
+            CalcTotal();
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
@@ -60,6 +61,7 @@ namespace CSVAccounting_Project
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 itemList.RemoveAt(index);
+                CalcTotal();
             }
         }
 
@@ -104,6 +106,8 @@ namespace CSVAccounting_Project
                 item.CategoryType = (Category)cmbCategory.SelectedItem!;
 
                 itemList[index] = item;
+
+                CalcTotal();
             }
         }
 
@@ -152,23 +156,60 @@ namespace CSVAccounting_Project
 
                 string[] lines = File.ReadAllLines(dialog.FileName, Encoding.UTF8);
 
-                for (int i = 1; i < lines.Length; i++)
+                try
                 {
-                    string[] cols = lines[i].Split(",");
-                    if (cols.Length != 5) continue;
 
-                    Item item = new Item();
+                    for (int i = 1; i < lines.Length; i++)
+                    {
+                        string[] cols = lines[i].Split(",");
+                        if (cols.Length != 5) continue;
 
-                    item.Date = DateTime.Parse(cols[0]);
-                    item.Note = cols[1];
-                    item.Amount = decimal.Parse(cols[2]);
-                    item.CategoryType = (Category)Enum.Parse(typeof(Category), cols[3]);
-                    item.IsIncome = cols[4] == "是" ? true : false;          
+                        Item item = new Item();
 
-                    itemList.Add(item);
+                        item.Date = DateTime.Parse(cols[0]);
+                        item.Note = cols[1];
+                        item.Amount = decimal.Parse(cols[2]);
+                        item.CategoryType = (Category)Enum.Parse(typeof(Category), cols[3]);
+                        item.IsIncome = cols[4] == "是" ? true : false;
+
+                        itemList.Add(item);
+                    }
+
+                    CalcTotal();
                 }
-
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"檔案格式不正確:{ex.ToString()}", "錯誤");
+                }
             }
+        }
+
+        public void CalcTotal()
+        {
+            decimal incoming = 0, outgoing = 0;
+            foreach (var item in itemList)
+            {
+                if (item.IsIncome)
+                {
+                    incoming += item.Amount;
+                }
+                else
+                {
+                    outgoing += item.Amount;
+                }
+            }
+
+
+            lblIncoming.Text = $"收入:{incoming}";
+            lblOutgoing.Text = $"支出:{outgoing}";
+            lblTotal.Text = $"結餘:{incoming - outgoing}";
+        }
+
+        private void btnClean_Click(object sender, EventArgs e)
+        {
+            itemList.Clear();
+
+            CalcTotal();
         }
     }
 }
