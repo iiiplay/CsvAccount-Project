@@ -7,7 +7,7 @@ namespace CSVAccounting_Project
 {
     public partial class Form1 : Form
     {
-        private BindingList<Item> items = new BindingList<Item>();
+        private BindingList<Item> itemList = new BindingList<Item>();
 
 
         public Form1()
@@ -16,7 +16,7 @@ namespace CSVAccounting_Project
 
             // 將enum型態轉換成combox可以讀取的型態
             cmbCategory.DataSource = Enum.GetValues(typeof(Category));
-            dgvItems.DataSource = items;
+            dgvItems.DataSource = itemList;
 
         }
 
@@ -42,7 +42,7 @@ namespace CSVAccounting_Project
             item.IsIncome = cbxIncome.Checked;
             item.CategoryType = (Category)cmbCategory.SelectedItem!;
 
-            items.Add(item);
+            itemList.Add(item);
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
@@ -59,7 +59,7 @@ namespace CSVAccounting_Project
             if (MessageBox.Show("確定刪除?", "警告",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                items.RemoveAt(index);
+                itemList.RemoveAt(index);
             }
         }
 
@@ -72,7 +72,7 @@ namespace CSVAccounting_Project
             MessageBox.Show($"點選到第{e.RowIndex + 1}列資料，進入編輯模式");
 
 
-            Item item = items[e.RowIndex];
+            Item item = itemList[e.RowIndex];
 
 
             dtpDate.Value = item.Date;
@@ -103,70 +103,29 @@ namespace CSVAccounting_Project
                 item.IsIncome = cbxIncome.Checked;
                 item.CategoryType = (Category)cmbCategory.SelectedItem!;
 
-                items[index] = item;
+                itemList[index] = item;
             }
         }
 
-        private void btnLoad_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "CSV 檔案|*.csv";
 
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                items.Clear();
-
-
-                try
-                {
-                    string[] lines = File.ReadAllLines(
-                        ofd.FileName, Encoding.UTF8);
-
-                    // 跳過第一行標題列，從索引 1 開始
-                    for (int i = 1; i < lines.Length; i++)
-                    {
-                        string[] cols = lines[i].Split(',');
-                        if (cols.Length < 5) continue;
-
-                        Item item = new Item
-                        {
-                            Date = DateTime.Parse(cols[0]),
-                            Note = cols[1],
-                            Amount = decimal.Parse(cols[2]),
-                            IsIncome = cols[3] == "是" ? true : false,
-                            CategoryType = (Category)
-                                Enum.Parse(typeof(Category), cols[4])
-                        };
-                        items.Add(item);
-                    }
-                }
-                catch (Exception)
-                {
-                    MessageBox.Show("檔案格式不正確。",
-                       "錯誤",
-                       MessageBoxButtons.OK,
-                       MessageBoxIcon.Error);
-                }
-            }
-        }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            if (itemList.Count == 0) { return; }
+
             SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "CSV檔案|*.csv";
+            dialog.FileName = "accounting.csv";
 
             if (dialog.ShowDialog() != DialogResult.OK) return;
 
-
-            dialog.Filter = "CSV 檔案|*.csv";
-            dialog.FileName = "accounting.csv";
-
             //寫入檔案
             using (StreamWriter sw = new StreamWriter(
-                dialog.FileName, false, Encoding.UTF8))
+                dialog.FileName, false, Encoding.Unicode))
             {
                 sw.WriteLine("日期,事項,金額,分類,收入");
 
-                foreach (Item item in items)
+                foreach (Item item in itemList)
                 {
                     string line = string.Format(
                         "{0},{1},{2},{3},{4}",
@@ -179,6 +138,36 @@ namespace CSVAccounting_Project
 
                     sw.WriteLine(line);
                 }
+            }
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "CSV檔案|*.csv";
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                itemList.Clear();
+
+                string[] lines = File.ReadAllLines(dialog.FileName, Encoding.UTF8);
+
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    string[] cols = lines[i].Split(",");
+                    if (cols.Length != 5) continue;
+
+                    Item item = new Item();
+
+                    item.Date = DateTime.Parse(cols[0]);
+                    item.Note = cols[1];
+                    item.Amount = decimal.Parse(cols[2]);
+                    item.CategoryType = (Category)Enum.Parse(typeof(Category), cols[3]);
+                    item.IsIncome = cols[4] == "是" ? true : false;          
+
+                    itemList.Add(item);
+                }
+
             }
         }
     }

@@ -7,7 +7,7 @@ namespace CSVAccounting_Project
     public class Item
     {
         public DateTime Date { get; set; }
-        public string Note { get; set; }
+        public string Note { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public bool IsIncome { get; set; }
         public Category CategoryType { get; set; }
